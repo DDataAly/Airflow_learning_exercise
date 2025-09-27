@@ -6,8 +6,11 @@ from exchanges.binance import BinanceExchange
 from exchanges.kraken import KrakenExchange
 from exchanges.coinbase import CoinbaseExchange
 from utils.logger import setup_logging
-from utils.get_best_price import find_best_price
-from utils.helpers import create_best_price_df, record_best_price
+# from utils.get_best_price import find_best_price
+from utils.helpers import create_best_price_df, record_best_price, get_request_time
+from utils.price_extract import get_price
+from utils.price_transform import new_find_best_price
+
 
 
 def get_user_input():
@@ -53,7 +56,15 @@ def run_code(
     total_cost = []
     for i in range(0, num_trans):
         print("Fetching the prices across exchanges...")
-        best_price = find_best_price(exchanges, path, vol_per_order)
+        request_time = get_request_time()
+        print(request_time)
+
+        get_price (exchanges, path, request_time)
+        best_price = new_find_best_price(exchanges, request_time, path, vol_per_order)
+
+
+
+        #best_price = find_best_price(exchanges, path, vol_per_order)
         total_cost.append(best_price[0])
         best_price_df = create_best_price_df(best_price)
         record_best_price(best_price_df, path)
