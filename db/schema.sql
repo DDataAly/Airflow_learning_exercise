@@ -22,7 +22,7 @@ CREATE TABLE exchange_quotes_snapshots (
     exchange_id INT REFERENCES exchanges(exchange_id),
     snapshot_time TIMESTAMPTZ not NULL,
     quote_volume NUMERIC(14,8) NOT NULL,
-    quote_cost NUMERIC (20,8) NOT NULL
+    quote_cost NUMERIC (20,8) NOT NULL,
     CONSTRAINT prevent_accidental_duplicate_snapshots UNIQUE (run_id, exchange_id, snapshot_time)
 );
 
