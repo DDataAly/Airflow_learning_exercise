@@ -5,3 +5,4 @@ venv
 src/docs/api_binance.py
 src/docs/api_coinbase.py
 src/docs/api_kraken.py
+.env
