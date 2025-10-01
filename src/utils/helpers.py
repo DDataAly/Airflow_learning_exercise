@@ -1,6 +1,31 @@
 from datetime import datetime
 import pandas as pd
 import os
+from src.exchanges.binance import BinanceExchange
+from src.exchanges.kraken import KrakenExchange
+from src.exchanges.coinbase import CoinbaseExchange
+
+
+def set_up_exchanges():
+    kraken = KrakenExchange(
+        "kraken",
+        "https://api.kraken.com/0/public/Depth",
+        {"pair": "XXBTZUSD", "count": 20},
+        "XXBTZUSD",
+    )
+    binance = BinanceExchange(
+        "binance",
+        "https://api.binance.com/api/v3/depth",
+        {"symbol": "BTCUSDT", "limit": 20},
+        "BTCUSDT",
+    )
+    coinbase = CoinbaseExchange(
+        "coinbase",
+        "https://api.exchange.coinbase.com/products/BTC-USD/book",
+        {"level": 2},
+        "BTC-USD",
+    )
+    return [kraken, binance, coinbase]
 
 
 def get_request_time() -> str:
