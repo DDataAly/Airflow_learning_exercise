@@ -9,7 +9,7 @@ def get_price(exchange, path: str, request_time: datetime ) -> list:
             logging.warning(
                 f"{exchange.name}: invalid or missing snapshot at {request_time}"
             )
-            continue
+            # continue
 
         snapshot = exchange.trim_snapshot(snapshot)
         exchange.save_order_book_snapshot(snapshot, path, request_time)
