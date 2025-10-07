@@ -2,25 +2,15 @@ import os
 import pendulum
 from src.utils.helpers import set_up_exchanges, get_request_time
 from src.utils.price_extract import get_price
-from airflow.sdk import Variable, dag, task
-
-
-def compute_schedule(trans_time: int, num_trans: int):
-    interval_minutes = max(1, (trans_time // num_trans) // 60)
-    return pendulum.duration(minutes=interval_minutes)
+from airflow.sdk import dag, task
 
 @dag(
-    schedule=compute_schedule(
-        int(Variable.get("trans_time", default=180)), #time in sec
-        int(Variable.get("num_trans", default=3))
-    ),
-    start_date=pendulum.datetime(2025, 9, 30, 11, 30, tz="Europe/London"),
+    schedule=None,  # No automatic scheduling; triggered externally
+    start_date=pendulum.datetime(2025, 1, 1, tz="Europe/London"),
     catchup=False,
     tags=["personal projects"],
 )
-
-def get_order_book_snapshots():
-    
+def extract_btc_snapshot():
     exchanges = set_up_exchanges()
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     path = os.path.join(base_dir, "data")
@@ -29,15 +19,111 @@ def get_order_book_snapshots():
     def fetch_snapshot(exchange):
         request_time = get_request_time()
         get_price(exchange, path, request_time)
-        return f"{exchange.name} snapshot at {request_time}"
+        return {"exchange": exchange.name, "request_time": request_time, "file_path": path}
 
     fetch_snapshot.expand(exchange=exchanges)
 
-dag_instance = get_order_book_snapshots()
+dag_instance = extract_btc_snapshot()
+
+
+# import os
+# import pendulum
+# from src.utils.helpers import set_up_exchanges, get_request_time
+# from src.utils.price_extract import get_price
+# from airflow.sdk import Variable, dag, task
+
+# NUM_TRANS = int(Variable.get("num_trans", default=3))
+# TRANS_TIME = int(Variable.get("trans_time", default=180))
+# START_DATE=pendulum.datetime(2025, 9, 30, 11, 30, tz="Europe/London")
+# END_DATE = START_DATE.add(seconds=TRANS_TIME + 110)
+
+
+# def compute_schedule(trans_time: int, num_trans: int):
+#     interval_minutes = max(1, (trans_time // num_trans) // 60)
+#     return pendulum.duration(minutes=interval_minutes)
+
+# @dag(
+#     schedule=compute_schedule(TRANS_TIME,NUM_TRANS),
+#     start_date=START_DATE,
+#     end_date = END_DATE,
+#     catchup=False,
+#     tags=["personal projects"],
+# )
+
+# def get_order_book_snapshots():
+#     NUM_TRANS = int(Variable.get("num_trans", default=3))
+#     current_iter = int(Variable.get("current_iteration", default=0))
+
+#     if current_iter >= NUM_TRANS:
+#         print(f"Reached max iterations ({NUM_TRANS}). Exiting.")
+#         return
+
+#     exchanges = set_up_exchanges()
+#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     path = os.path.join(base_dir, "data")
+
+#     @task
+#     def fetch_snapshot(exchange):
+#         request_time = get_request_time()
+#         get_price(exchange, path, request_time)
+#         return f"{exchange.name} snapshot at {request_time}"
+
+#     fetch_snapshot.expand(exchange=exchanges)
+    
+#     Variable.set("current_iteration", str(current_iter + 1))
+#     print(f"Incremented iteration: {str(current_iter + 1)} / {NUM_TRANS}")
+
+# dag_instance = get_order_book_snapshots()
 
 
 
 
+# import os
+# import pendulum
+# from src.utils.helpers import set_up_exchanges, get_request_time
+# from src.utils.price_extract import get_price
+# from airflow.sdk import Variable, dag, task
+
+
+# def compute_schedule(trans_time: int, num_trans: int):
+#     interval_minutes = max(1, (trans_time // num_trans) // 60)
+#     return pendulum.duration(minutes=interval_minutes)
+
+# @dag(
+#     schedule=compute_schedule(
+#         int(Variable.get("trans_time", default=180)), #time in sec
+#         int(Variable.get("num_trans", default=3))
+#     ),
+#     start_date=pendulum.datetime(2025, 9, 30, 11, 30, tz="Europe/London"),
+#     catchup=False,
+#     tags=["personal projects"],
+# )
+
+# def get_order_book_snapshots(num_trans):
+
+#     num_trans = int(Variable.get("num_trans", default=3))
+#     current_iter = int(Variable.get("current_iteration", default=0))
+
+#     if current_iter >= num_trans:
+#         print(f"Reached max iterations ({num_trans}). Exiting.")
+#         return
+    
+#     exchanges = set_up_exchanges()
+#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     path = os.path.join(base_dir, "data")
+
+#     @task
+#     def fetch_snapshot(exchange):
+#         request_time = get_request_time()
+#         get_price(exchange, path, request_time)
+#         return f"{exchange.name} snapshot at {request_time}"
+
+#     fetch_snapshot.expand(exchange=exchanges)
+    
+#     Variable.set("current_iteration", current_iter + 1)
+#     print(f"Incremented iteration: {current_iter + 1} / {num_trans}")
+
+# dag_instance = get_order_book_snapshots()
 
 
 
