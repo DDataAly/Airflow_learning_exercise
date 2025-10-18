@@ -1,32 +1,36 @@
-from datetime import datetime
 import pandas as pd
 import os
+from datetime import datetime
 from src.exchanges.binance import BinanceExchange
 from src.exchanges.kraken import KrakenExchange
 from src.exchanges.coinbase import CoinbaseExchange
 
 
-def set_up_exchanges():
-    kraken = KrakenExchange(
-        "kraken",
-        "https://api.kraken.com/0/public/Depth",
-        {"pair": "XXBTZUSD", "count": 20},
-        "XXBTZUSD",
-    )
-    binance = BinanceExchange(
-        "binance",
-        "https://api.binance.com/api/v3/depth",
-        {"symbol": "BTCUSDT", "limit": 20},
-        "BTCUSDT",
-    )
-    coinbase = CoinbaseExchange(
-        "coinbase",
-        "https://api.exchange.coinbase.com/products/BTC-USD/book",
-        {"level": 2},
-        "BTC-USD",
-    )
-    return [kraken, binance, coinbase]
-
+def set_up_exchanges(exchanges_list = None):
+    exchange_objects = []
+    for name in exchanges_list:
+        if name.lower() == 'kraken':
+            exchange_objects.append(KrakenExchange(
+                                                "kraken",
+                                                "https://api.kraken.com/0/public/Depth",
+                                                {"pair": "XXBTZUSD", "count": 20},
+                                                "XXBTZUSD",
+                                    ))
+        if name.lower() =='binance':   
+            exchange_objects.append(BinanceExchange(
+                                                "binance",
+                                                "https://api.binance.com/api/v3/depth",
+                                                {"symbol": "BTCUSDT", "limit": 20},
+                                                "BTCUSDT",
+                                            )) 
+        if name.lower() == 'coinbase':
+            exchange_objects.append(CoinbaseExchange(
+                                                "coinbase",
+                                                "https://api.exchange.coinbase.com/products/BTC-USD/book",
+                                                {"level": 2},
+                                                "BTC-USD",
+                                            ))
+        return exchange_objects
 
 def get_request_time() -> str:
     request_time = datetime.now()
