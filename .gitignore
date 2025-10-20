@@ -1,8 +1,23 @@
-venv
+# Airflow 
+airflow.db
+airflow.cfg
+logs/
+airflow-scheduler.*
+*.pid
+
+# Python
 **/.pycache
 **/__pycache__
-**.json
-src/docs/api_binance.py
-src/docs/api_coinbase.py
-src/docs/api_kraken.py
+
+# VSCode
+.vscode/
+
+# Environment
+venv/
 .env
+
+# Secrets
+simple_auth_manager_passwords.json.generated
+
+# Local files used in dev and not needed in the final version of project
+**.json
